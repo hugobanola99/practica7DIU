@@ -5,17 +5,66 @@
  */
 package com.mycompany.practica7diu;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JFileChooser;
+import javax.swing.JScrollBar;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import org.opencv.core.Core;
+import org.opencv.core.Mat;
+import org.opencv.imgcodecs.Imgcodecs;
+
 /**
  *
  * @author hugob
  */
 public class Practica7 extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Practica7
-     */
+    JScrollBar barraV;
+    JScrollBar barraH;
+    EstadisticasImagen est = new EstadisticasImagen();
+    JFileChooser fc = new JFileChooser();
+    FileNameExtensionFilter filtro = null;
+    File fichero;
+    Mat m;
+    class MiListener implements AdjustmentListener {
+
+        @Override
+        public void adjustmentValueChanged(AdjustmentEvent ae) {
+            //System.out.println("Posicion"+ panelDeslizante.getViewport().getViewPosition().toString());
+            //System.out.println("Tamaño" + panelDeslizante.getViewport().getExtentSize().toString());
+            Point p = panelDeslizante.getViewport().getViewPosition();
+            Dimension d = panelDeslizante.getViewport().getExtentSize();
+            
+            
+            est.calculaEstadisticas(m, p, d);
+            System.out.println("Maximo Azul: "+est.getMaximo()[est.AZUL]);
+            System.out.println("Minimo Azul: "+est.getMinimo()[est.AZUL]);
+            System.out.println("Promedio Azul: "+est.getPromedio()[est.AZUL]);
+            
+        }
+        
+    }
+    
     public Practica7() {
         initComponents();
+        barraV = panelDeslizante.getVerticalScrollBar();
+        barraH = panelDeslizante.getHorizontalScrollBar();
+        
+        barraV.addAdjustmentListener(new MiListener());
+        barraH.addAdjustmentListener(new MiListener());
+        
+        filtro = new FileNameExtensionFilter("Imagenes","jpg","jpeg","png");
+        fc.addChoosableFileFilter(filtro);
+        
+        nu.pattern.OpenCV.loadShared();
+        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
     }
 
     /**
@@ -27,21 +76,76 @@ public class Practica7 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        panelDeslizante = new javax.swing.JScrollPane();
+        lienzo = new com.mycompany.practica7diu.Lienzo();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem1 = new javax.swing.JMenuItem();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        javax.swing.GroupLayout lienzoLayout = new javax.swing.GroupLayout(lienzo);
+        lienzo.setLayout(lienzoLayout);
+        lienzoLayout.setHorizontalGroup(
+            lienzoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 690, Short.MAX_VALUE)
+        );
+        lienzoLayout.setVerticalGroup(
+            lienzoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 461, Short.MAX_VALUE)
+        );
+
+        panelDeslizante.setViewportView(lienzo);
+
+        jMenu1.setText("File");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_A, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        jMenuItem1.setText("Abrir");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(panelDeslizante, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 388, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(panelDeslizante, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(170, 170, 170))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        int res = fc.showOpenDialog(null);
+        if(res == JFileChooser.APPROVE_OPTION){
+            fichero = fc.getSelectedFile();
+            System.out.println(fc.getSelectedFile().getAbsolutePath());
+            m = Imgcodecs.imread(fc.getSelectedFile().getAbsolutePath());
+            try {
+                lienzo.setImagen(fichero.getAbsolutePath());
+            } catch (IOException ex) {
+                Logger.getLogger(Practica7.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            repaint();
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -79,5 +183,10 @@ public class Practica7 extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
+    private com.mycompany.practica7diu.Lienzo lienzo;
+    private javax.swing.JScrollPane panelDeslizante;
     // End of variables declaration//GEN-END:variables
 }
