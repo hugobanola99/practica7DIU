@@ -25,13 +25,6 @@ public class Lienzo extends JPanel{
     }
     public Lienzo() {
         
-        /*
-        try{
-            imagen = ImageIO.read(new URL("https://www.cambio16.com/wp-content/uploads/2017/04/fotos-impresionantes-imagenes-que-parecen-modificadas-con-photoshop-11.jpeg"));
-        }catch(IOException ex){
-            System.out.println("Excepción" +ex);
-        }
-           */
 
     }
     
